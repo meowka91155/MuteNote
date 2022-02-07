@@ -2,10 +2,17 @@ package com.example.note;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Debug;
 import android.util.Log;
@@ -30,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     Button smallerFont;
     //Button biggerFont;
     Button textPageButton;
+    Button notify_Btn;
 
 
     //supposed to be scroll zoom
@@ -46,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     RadioButton radio_Centre;
     RadioButton radio_Right;
 
+    private NotificationManagerCompat notificationManager;
 
     @Nullable
     @Override
@@ -99,6 +108,9 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
 
 
+//Notification
+        notificationManager = NotificationManagerCompat.from(this);
+
 
         //settings button
         settingsButton=findViewById(R.id.settingsButton);
@@ -136,6 +148,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 }
                 else if (radio_Right.isChecked())
             {
+                return;
 
                 }
             }
@@ -144,6 +157,30 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     }
 
 
+    //send notification
+    public void sendOnChannel1(View v){
+
+        Intent activityIntent = new Intent( this, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(this,
+                0, activityIntent, 0);
+
+        Intent broadcastIntent = new Intent(this, NotificationReceiver.class);
+        broadcastIntent.putExtra("toastMessage", "test");
+        PendingIntent actionIntent = PendingIntent.getBroadcast(this,
+                0, broadcastIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Notification notification = new NotificationCompat.Builder(this, AppStart.CHANNEL_1_ID)
+                .setSmallIcon(R.drawable.ic_1)
+                .setContentTitle("Note")
+                .setContentText("Makes the app come back")
+                .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                .setContentIntent(contentIntent)
+                .addAction(R.mipmap.ic_launcher, "toast", actionIntent)
+                .build();
+        notificationManager.notify(1,notification);
+    }
 
     public void openSettings(){
         Intent intent = new Intent(this, Settings.class);
